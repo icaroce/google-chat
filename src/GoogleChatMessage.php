@@ -2,9 +2,12 @@
 
 namespace NotificationChannels\GoogleChat;
 
+use App\Models\User;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
 use NotificationChannels\GoogleChat\Concerns\ValidatesCardComponents;
+use NotificationChannels\GoogleChat\Models\Room;
+use NotificationChannels\GoogleChat\Models\Space;
 
 class GoogleChatMessage implements Arrayable
 {
@@ -18,21 +21,21 @@ class GoogleChatMessage implements Arrayable
     protected $payload = [];
 
     /**
-     * The Space's webhook URL where this message should be sent.
+     * The Space's resource name where this message should be sent.
      *
-     * @var string|null
+     * @var Space
      */
-    protected $endpoint = null;
+    protected $space = Space::class;
 
     /**
-     * Set a specific space's webhook URL where this message should be sent to.
+     * Set a specific space's resource name where this message should be sent to.
      *
-     * @param string $space Either a fully-qualified URL, or a nested configuration key
+     * @param string $space Resource name in the form spaces/*messages/*.
      * @return self
      */
-    public function to(string $space): GoogleChatMessage
+    public function to(Space $space): GoogleChatMessage
     {
-        $this->endpoint = $space;
+        $this->space = $space;
 
         return $this;
     }
@@ -216,11 +219,11 @@ class GoogleChatMessage implements Arrayable
      * Return the configured webhook URL of the recipient space, or null if this has
      * not been configured.
      *
-     * @return string|null
+     * @return Space
      */
-    public function getSpace(): ?string
+    public function getSpace(): Space
     {
-        return $this->endpoint;
+        return $this->space;
     }
 
     /**
